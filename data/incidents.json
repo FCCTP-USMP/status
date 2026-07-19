@@ -1,0 +1,44 @@
+{
+  "incidents": [
+    {
+      "id": "1784432197650-okj3",
+      "service": "Chatwoot FCCTP",
+      "url": "https://chatwoot.fcctp.edu.pe/",
+      "type": "down",
+      "started_at": "2026-07-19T03:36:11.504Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": "ENETUNREACH"
+    },
+    {
+      "id": "1784432193633-nyr9",
+      "service": "Odoo FCCTP",
+      "url": "https://odoo.fcctp.edu.pe/",
+      "type": "down",
+      "started_at": "2026-07-19T03:36:11.504Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": "ENETUNREACH"
+    },
+    {
+      "id": "1784432189612-8u2r",
+      "service": "n8n FCCTP",
+      "url": "https://n8n.fcctp.edu.pe/",
+      "type": "down",
+      "started_at": "2026-07-19T03:36:11.504Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": "ENETUNREACH"
+    },
+    {
+      "id": "1784432181519-fcsu",
+      "service": "Dokploy",
+      "url": "https://dokploy.fcctp.edu.pe",
+      "type": "down",
+      "started_at": "2026-07-19T03:36:11.504Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": "ECONNABORTED"
+    }
+  ]
+}
