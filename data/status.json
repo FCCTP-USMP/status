@@ -1,1 +1,122 @@
-{}
+{
+  "https://dokploy.fcctp.edu.pe": {
+    "status": "down",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": "2026-07-19T03:56:18.532Z",
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 1
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 10038,
+    "statusCode": null,
+    "error_message": "ECONNABORTED"
+  },
+  "https://fcctpauth.usmp.edu.pe": {
+    "status": "up",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": null,
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 0
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 689,
+    "statusCode": 200,
+    "error_message": null
+  },
+  "https://app.fcctp.edu.pe/": {
+    "status": "up",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": null,
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 0
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 1824,
+    "statusCode": 200,
+    "error_message": null
+  },
+  "https://n8n.fcctp.edu.pe/": {
+    "status": "down",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": "2026-07-19T03:56:18.532Z",
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 1
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 10004,
+    "statusCode": null,
+    "error_message": "ECONNABORTED"
+  },
+  "https://odoo.fcctp.edu.pe/": {
+    "status": "down",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": "2026-07-19T03:56:18.532Z",
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 1
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 10007,
+    "statusCode": null,
+    "error_message": "ECONNABORTED"
+  },
+  "https://chatwoot.fcctp.edu.pe/": {
+    "status": "down",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": "2026-07-19T03:56:18.532Z",
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 1
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 10008,
+    "statusCode": null,
+    "error_message": "ECONNABORTED"
+  },
+  "https://apps.fcctp.edu.pe/bienestar-universitario": {
+    "status": "up",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": null,
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 0
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 1013,
+    "statusCode": 200,
+    "error_message": null
+  },
+  "https://mesadepartes.fcctp.edu.pe/": {
+    "status": "up",
+    "last_state_change": "2026-07-19T03:56:18.532Z",
+    "last_notification_sent": null,
+    "dailyUptime": {
+      "2026-07-18": {
+        "checks": 1,
+        "failures": 0
+      }
+    },
+    "last_check": "2026-07-19T03:56:18.532Z",
+    "latency": 1183,
+    "statusCode": 401,
+    "error_message": null
+  }
+}
