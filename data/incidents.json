@@ -36,8 +36,8 @@
       "url": "https://chatwoot.fcctp.edu.pe/",
       "type": "down",
       "started_at": "2026-07-19T03:56:18.532Z",
-      "resolved_at": null,
-      "duration_minutes": null,
+      "resolved_at": "2026-07-19T16:13:19.366Z",
+      "duration_minutes": 737,
       "error": "ECONNABORTED"
     },
     {
@@ -46,8 +46,8 @@
       "url": "https://odoo.fcctp.edu.pe/",
       "type": "down",
       "started_at": "2026-07-19T03:56:18.532Z",
-      "resolved_at": null,
-      "duration_minutes": null,
+      "resolved_at": "2026-07-19T16:13:19.366Z",
+      "duration_minutes": 737,
       "error": "ECONNABORTED"
     },
     {
@@ -56,8 +56,8 @@
       "url": "https://n8n.fcctp.edu.pe/",
       "type": "down",
       "started_at": "2026-07-19T03:56:18.532Z",
-      "resolved_at": null,
-      "duration_minutes": null,
+      "resolved_at": "2026-07-19T16:13:19.366Z",
+      "duration_minutes": 737,
       "error": "ECONNABORTED"
     },
     {
@@ -66,8 +66,8 @@
       "url": "https://dokploy.fcctp.edu.pe",
       "type": "down",
       "started_at": "2026-07-19T03:56:18.532Z",
-      "resolved_at": null,
-      "duration_minutes": null,
+      "resolved_at": "2026-07-19T16:13:19.366Z",
+      "duration_minutes": 737,
       "error": "ECONNABORTED"
     }
   ]

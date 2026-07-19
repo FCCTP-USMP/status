@@ -1,22 +1,22 @@
 {
   "https://dokploy.fcctp.edu.pe": {
-    "status": "down",
+    "status": "up",
     "last_state_change": "2026-07-19T03:56:18.532Z",
-    "last_notification_sent": "2026-07-19T12:32:22.220Z",
+    "last_notification_sent": "2026-07-19T16:13:19.366Z",
     "dailyUptime": {
       "2026-07-18": {
         "checks": 1,
         "failures": 1
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 7
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 10061,
-    "statusCode": null,
-    "error_message": "ECONNABORTED"
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 326,
+    "statusCode": 200,
+    "error_message": null
   },
   "https://fcctpauth.usmp.edu.pe": {
     "status": "up",
@@ -28,12 +28,12 @@
         "failures": 0
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 0
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 617,
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 275,
     "statusCode": 200,
     "error_message": null
   },
@@ -47,71 +47,71 @@
         "failures": 0
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 1
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 2420,
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 1584,
     "statusCode": 200,
     "error_message": null
   },
   "https://n8n.fcctp.edu.pe/": {
-    "status": "down",
+    "status": "up",
     "last_state_change": "2026-07-19T03:56:18.532Z",
-    "last_notification_sent": "2026-07-19T12:32:22.220Z",
+    "last_notification_sent": "2026-07-19T16:13:19.366Z",
     "dailyUptime": {
       "2026-07-18": {
         "checks": 1,
         "failures": 1
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 7
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 10005,
-    "statusCode": null,
-    "error_message": "ECONNABORTED"
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 282,
+    "statusCode": 200,
+    "error_message": null
   },
   "https://odoo.fcctp.edu.pe/": {
-    "status": "down",
+    "status": "up",
     "last_state_change": "2026-07-19T03:56:18.532Z",
-    "last_notification_sent": "2026-07-19T12:32:22.220Z",
+    "last_notification_sent": "2026-07-19T16:13:19.366Z",
     "dailyUptime": {
       "2026-07-18": {
         "checks": 1,
         "failures": 1
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 7
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 10007,
-    "statusCode": null,
-    "error_message": "ECONNABORTED"
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 270,
+    "statusCode": 404,
+    "error_message": null
   },
   "https://chatwoot.fcctp.edu.pe/": {
-    "status": "down",
+    "status": "up",
     "last_state_change": "2026-07-19T03:56:18.532Z",
-    "last_notification_sent": "2026-07-19T12:32:22.220Z",
+    "last_notification_sent": "2026-07-19T16:13:19.366Z",
     "dailyUptime": {
       "2026-07-18": {
         "checks": 1,
         "failures": 1
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 7
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 10006,
-    "statusCode": null,
-    "error_message": "ECONNABORTED"
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 439,
+    "statusCode": 200,
+    "error_message": null
   },
   "https://apps.fcctp.edu.pe/bienestar-universitario": {
     "status": "up",
@@ -123,12 +123,12 @@
         "failures": 0
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 1
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 3386,
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 528,
     "statusCode": 200,
     "error_message": null
   },
@@ -142,12 +142,12 @@
         "failures": 0
       },
       "2026-07-19": {
-        "checks": 7,
+        "checks": 8,
         "failures": 1
       }
     },
-    "last_check": "2026-07-19T15:13:35.518Z",
-    "latency": 1383,
+    "last_check": "2026-07-19T16:13:19.366Z",
+    "latency": 913,
     "statusCode": 401,
     "error_message": null
   }
