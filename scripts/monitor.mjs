@@ -79,7 +79,14 @@ function createTransporter() {
     log('SMTP not configured, skipping email');
     return null;
   }
-  return nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass } });
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    debug: true,
+    logger: true
+  });
 }
 
 async function sendEmail(transporter, subject, html) {
