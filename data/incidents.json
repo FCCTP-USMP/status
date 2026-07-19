@@ -1,6 +1,36 @@
 {
   "incidents": [
     {
+      "id": "1784450312142-owop",
+      "service": "Mesa de Partes",
+      "url": "https://mesadepartes.fcctp.edu.pe/",
+      "type": "down",
+      "started_at": "2026-07-19T08:37:50.326Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": null
+    },
+    {
+      "id": "1784450311865-xnyg",
+      "service": "Bienestar Universitario",
+      "url": "https://apps.fcctp.edu.pe/bienestar-universitario",
+      "type": "down",
+      "started_at": "2026-07-19T08:37:50.326Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": null
+    },
+    {
+      "id": "1784450281436-0f4w",
+      "service": "App FCCTP",
+      "url": "https://app.fcctp.edu.pe/",
+      "type": "down",
+      "started_at": "2026-07-19T08:37:50.326Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": null
+    },
+    {
       "id": "1784433421110-rbc8",
       "service": "Chatwoot FCCTP",
       "url": "https://chatwoot.fcctp.edu.pe/",
