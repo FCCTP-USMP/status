@@ -1,6 +1,16 @@
 {
   "incidents": [
     {
+      "id": "1784553005972-h0f5",
+      "service": "Dokploy2",
+      "url": "https://dokploy2.fcctp.edu.pe",
+      "type": "down",
+      "started_at": "2026-07-20T13:10:05.098Z",
+      "resolved_at": null,
+      "duration_minutes": null,
+      "error": "ENOTFOUND"
+    },
+    {
       "id": "1784537135209-eoqc",
       "service": "Mesa de Partes",
       "url": "https://mesadepartes.fcctp.edu.pe/",
