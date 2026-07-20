@@ -1,0 +1,24 @@
+{
+  "name": "fcctp-status",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-07-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist"
+  },
+  "d1_databases": [
+    {
+      "binding": "fcctp_status_db",
+      "database_name": "fcctp-status-db",
+      "database_id": "9cd7dac9-ac3c-4549-8e1c-69ae3145c162"
+    }
+  ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "vars": {
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "465",
+    "SMTP_SECURE": "true"
+  }
+}

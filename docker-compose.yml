@@ -1,7 +1,7 @@
 services:
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: fcctp-status-mailhog
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: fcctp-status-mailpit
     ports:
       - "1025:1025"
       - "8025:8025"

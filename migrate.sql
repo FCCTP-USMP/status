@@ -1,0 +1,12 @@
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://dokploy.fcctp.edu.pe', 'Dokploy', 'Gestor de despliegue de aplicaciones y contenedores.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://fcctpauth.usmp.edu.pe', 'Fcctpauth', 'Servicio de autenticación.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://app.fcctp.edu.pe/', 'Appfcctp', 'Aplicación institucional principal de la FCCTP.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://n8n.fcctp.edu.pe/', 'N8n', 'Plataforma de automatización de flujos de trabajo e integraciones.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://odoo.fcctp.edu.pe/', 'Odoo', 'Sistema ERP para la gestión administrativa y académica.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://chatwoot.fcctp.edu.pe/', 'Chatwoot', 'Plataforma de atención integrado con WhatsApp Business para Pregrado y Posgrado.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://apps.fcctp.edu.pe/bienestar-universitario', 'Apps OBU', 'Inscripción a actividades extracurriculares, registro de atenciones y renovación de beneficios.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://mesadepartes.fcctp.edu.pe/', 'Mesa de Partes', 'Ingreso de documentos y solicitudes a Decanato.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://apps.fcctp.edu.pe/certificacion-autenticacion/', 'Certificación y Autenticación de Documentos', 'Autenticación de documentos emitidos por la facultad.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://bienestar.fcctp.edu.pe/', 'OBU', 'Ficha socioeconómica para evaluación de becas y categorización.', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://apps.fcctp.edu.pe/encuestas/', 'Sistema de Encuestas', 'Encuestas a estudiantes y docentes, encuestas de desempeño docente', 'up');
+INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('https://apps.fcctp.edu.pe/carta-de-presentacion/', 'Carta de Presentación', 'Solicitud de cartas de presentación para prácticas pre-profesionales.', 'up');

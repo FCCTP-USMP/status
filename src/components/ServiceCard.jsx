@@ -29,6 +29,9 @@ export default function ServiceCard({ service, latencyData }) {
             <div className="min-w-0">
               <h3 className="font-semibold text-gray-900 dark:text-white truncate">{service.name}</h3>
               <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{service.url}</p>
+              {service.description && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{service.description}</p>
+              )}
             </div>
           </div>
 
@@ -67,7 +70,7 @@ export default function ServiceCard({ service, latencyData }) {
                 </div>
               )}
             </div>
-            <LatencyChart data={serviceLatency} dailyUptime={service.dailyUptime} />
+            <LatencyChart data={serviceLatency} />
           </div>
         </div>
       )}

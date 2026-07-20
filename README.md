@@ -1,70 +1,81 @@
 # FCCTP Status
 
-Monitoreo automatizado del estado de los servicios institucionales de la Facultad de Ciencias de la Comunicación, Turismo y Psicología (FCCTP) de la Universidad de San Martín de Porres.
+Dashboard de monitoreo del estado de los servicios institucionales de la Facultad de Ciencias de la Comunicación, Turismo y Psicología (FCCTP) de la Universidad de San Martín de Porres.
+
+**Dashboard en vivo:** https://fcctp-status.fcctp.workers.dev/
 
 ## Servicios monitoreados
 
-- Dokploy
-- FCCTP Auth
-- App FCCTP
-- n8n FCCTP
-- Odoo FCCTP
-- Chatwoot FCCTP
-- Bienestar Universitario
-- Mesa de Partes
+Los 12 servicios están definidos en `src/services.js` (única fuente de verdad).
+
+Actualmente se monitorean:
+- Dokploy, FCCTP Auth, App FCCTP, n8n FCCTP, Odoo FCCTP, Chatwoot FCCTP
+- Bienestar Universitario, Mesa de Partes, y otros
 
 ## Stack
 
-- **Frontend**: React + Vite + Tailwind CSS + Recharts
-- **Backend**: Script Node.js con axios y nodemailer
-- **Monitoreo**: GitHub Actions (cada 10 minutos)
-- **Despliegue**: GitHub Pages
-- **Email local**: MailHog (desarrollo)
+- **Frontend:** React + Vite + Tailwind CSS + Recharts
+- **Backend:** Cloudflare Workers
+- **Base de datos:** Cloudflare D1 (SQLite)
+- **Monitoreo:** Cron Trigger de Workers (cada 5 minutos)
+- **Email local:** MailPit (Docker)
+- **Email producción:** SMTP vía Gmail (puerto 465 con TLS)
 
 ## Scripts
 
-```bash
-npm run dev          # Inicia el frontend en modo desarrollo
-npm run build        # Compila el frontend para producción
-npm run preview      # Previsualiza el build
-npm run monitor      # Ejecuta el chequeo de servicios y envía alertas
-npm run reset        # Resetea los archivos de datos (status, latency, incidents)
-```
-
-## Variables de entorno
-
-Copiar `.env.example` a `.env` y configurar:
-
-```
-SMTP_HOST=localhost
-SMTP_PORT=1025
-SMTP_USER=any
-SMTP_PASS=any
-SMTP_FROM=FCCTP Status <status@fcctp.edu.pe>
-NOTIFICATION_EMAILS=admin1@example.com,admin2@example.com
-```
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Inicia el frontend en modo desarrollo |
+| `npm run build` | Compila el frontend para producción |
+| `npm run dev:worker` | Inicia el Worker local (sin --remote) |
+| `npm run dev:worker:remote` | Inicia el Worker local apuntando a D1 remota |
+| `npm run deploy:worker` | Compila frontend y despliega Worker a Cloudflare |
+| `npm run reset` | Recrea y siembra la D1 local con datos de prueba |
+| `npm run reset:worker` | Recrea y siembra la D1 remota |
+| `npm run update:services` | Sincroniza nombres/descripciones en D1 local |
+| `npm run update:services-worker` | Sincroniza nombres/descripciones en D1 remota |
+| `npm run test:email` | Envía correo de prueba a MailPit local |
+| `npm run test:email:remote` | Envía correo de prueba vía Gmail remoto |
 
 ## Desarrollo local
 
 ```bash
-# Iniciar MailHog para correos locales
+# 1. Iniciar MailPit para capturar correos locales
 docker compose up -d
 
-# Iniciar frontend
-npm run dev
+# 2. Inicializar la base de datos local
+npm run reset
 
-# Ejecutar monitor manualmente
-npm run monitor
+# 3. Iniciar el Worker (en una terminal)
+npm run dev:worker
+
+# 4. Iniciar el frontend (en otra terminal)
+npm run dev
 ```
 
-MailHog web UI: http://localhost:8025
+MailPit web UI: http://localhost:8025
 
-## GitHub Pages
+## Variables de entorno
 
-El frontend se despliega automáticamente en GitHub Pages:
+### Local (archivo `.dev.vars`)
+```env
+SMTP_HOST="127.0.0.1"
+SMTP_PORT="1025"
+SMTP_SECURE="false"
+SMTP_USER=""
+SMTP_PASS=""
+NOTIFICATION_EMAIL="alertas-local@fcctp.local"
+TEST_TOKEN="token-local-test-seguro"
+```
 
-👉 **[https://fcctp-usmp.github.io/status/](https://fcctp-usmp.github.io/status/)**
+### Producción (secretos de Cloudflare)
+```bash
+npx wrangler secret put SMTP_USER
+npx wrangler secret put SMTP_PASS
+npx wrangler secret put NOTIFICATION_EMAIL
+npx wrangler secret put TEST_TOKEN
+```
 
 ## Arquitectura
 
-El monitor ejecuta un chequeo de todos los servicios cada 10 minutos vía GitHub Actions. Los resultados se almacenan en `data/` (status.json, latency.json, incidents.json) y se despliegan a GitHub Pages. Cuando un servicio cambia de estado, se envía un correo resumen con todos los servicios caídos a los destinatarios configurados.
+El Worker ejecuta un chequeo de todos los servicios cada 5 minutos vía Cron Trigger. Los resultados se almacenan en D1 (tablas `services`, `latency_checks`, `daily_uptime`, `incidents`). Cuando un servicio cambia de estado, se envía un correo resumen con todos los servicios caídos a los destinatarios configurados. El frontend es servido como asset estático desde el mismo Worker.

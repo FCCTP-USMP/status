@@ -6,12 +6,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "monitor": "node --env-file=.env scripts/monitor.mjs",
-    "reset": "node scripts/reset.mjs"
-  },
-  "dependencies": {
-    "axios": "^1.7.7",
-    "nodemailer": "^6.9.15"
+    "reset": "node scripts/reset.mjs",
+    "generate-migrate": "node scripts/generate-migration.mjs",
+    "update:services": "node scripts/update-services.mjs",
+    "update:services-worker": "node scripts/update-services.mjs --remote",
+    "test:email": "node scripts/trigger-test-email.mjs",
+    "test:email:remote": "node scripts/trigger-test-email.mjs --remote",
+    "reset:worker": "node scripts/reset.mjs --remote",
+    "deploy:worker": "npm run build && npx wrangler deploy",
+    "dev:worker": "npx wrangler dev src/worker.js",
+    "dev:worker:remote": "npx wrangler dev src/worker.js --remote"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -21,6 +25,7 @@
     "react-dom": "^18.3.1",
     "recharts": "^2.13.3",
     "tailwindcss": "^3.4.13",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "wrangler": "^4.112.0"
   }
 }

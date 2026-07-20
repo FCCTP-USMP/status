@@ -1,12 +1,26 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = path.resolve(__dirname, '..', 'data');
+const dbName = 'fcctp-status-db';
 
-fs.writeFileSync(path.join(DATA_DIR, 'status.json'), '{}', 'utf-8');
-fs.writeFileSync(path.join(DATA_DIR, 'latency.json'), '{"checks":[]}', 'utf-8');
-fs.writeFileSync(path.join(DATA_DIR, 'incidents.json'), '{"incidents":[]}', 'utf-8');
+function runReset(isRemote) {
+  const target = isRemote ? '--remote' : '--local';
+  console.log(`Reseteando base de datos ${isRemote ? 'REMOTA' : 'LOCAL'}...`);
 
-console.log('Data reset complete.');
+  try {
+    console.log('- Eliminando tablas existentes...');
+    execSync(`npx wrangler d1 execute ${dbName} ${target} --command="DROP TABLE IF EXISTS latency_checks; DROP TABLE IF EXISTS daily_uptime; DROP TABLE IF EXISTS incidents; DROP TABLE IF EXISTS services;"`, { stdio: 'inherit' });
+
+    console.log('- Recreando esquema...');
+    execSync(`npx wrangler d1 execute ${dbName} ${target} --file=./schema.sql`, { stdio: 'inherit' });
+
+    console.log('- Insertando servicios iniciales...');
+    execSync(`npx wrangler d1 execute ${dbName} ${target} --file=./migrate.sql`, { stdio: 'inherit' });
+
+    console.log(`\nBase de datos ${isRemote ? 'REMOTA' : 'LOCAL'} reseteada con exito.\n`);
+  } catch (error) {
+    console.error(`Error reseteando base de datos ${isRemote ? 'REMOTA' : 'LOCAL'}:`, error.message);
+  }
+}
+
+const isRemote = process.argv.includes('--remote');
+runReset(isRemote);
