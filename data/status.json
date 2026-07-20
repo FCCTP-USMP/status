@@ -13,12 +13,12 @@
         "failures": 7
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 0
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 610,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 1265,
     "statusCode": 200,
     "error_message": null
   },
@@ -36,12 +36,12 @@
         "failures": 0
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 0
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 630,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 1601,
     "statusCode": 200,
     "error_message": null
   },
@@ -59,12 +59,12 @@
         "failures": 1
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 1
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 2500,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 5602,
     "statusCode": 200,
     "error_message": null
   },
@@ -82,12 +82,12 @@
         "failures": 7
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 0
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 566,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 1239,
     "statusCode": 200,
     "error_message": null
   },
@@ -105,12 +105,12 @@
         "failures": 7
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 0
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 558,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 1225,
     "statusCode": 404,
     "error_message": null
   },
@@ -128,12 +128,12 @@
         "failures": 7
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 0
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 1377,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 1451,
     "statusCode": 200,
     "error_message": null
   },
@@ -151,12 +151,12 @@
         "failures": 1
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 1
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 1357,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 4092,
     "statusCode": 200,
     "error_message": null
   },
@@ -174,28 +174,13 @@
         "failures": 1
       },
       "2026-07-20": {
-        "checks": 35,
+        "checks": 36,
         "failures": 1
       }
     },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 1556,
+    "last_check": "2026-07-20T13:19:05.652Z",
+    "latency": 3324,
     "statusCode": 401,
     "error_message": null
-  },
-  "https://dokploy2.fcctp.edu.pe": {
-    "status": "down",
-    "last_state_change": "2026-07-20T13:10:05.098Z",
-    "last_notification_sent": "2026-07-20T13:10:05.098Z",
-    "dailyUptime": {
-      "2026-07-20": {
-        "checks": 2,
-        "failures": 2
-      }
-    },
-    "last_check": "2026-07-20T13:15:22.690Z",
-    "latency": 340,
-    "statusCode": null,
-    "error_message": "ENOTFOUND"
   }
 }

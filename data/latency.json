@@ -3190,12 +3190,6 @@
           "latency": 540
         },
         {
-          "url": "https://dokploy2.fcctp.edu.pe",
-          "name": "Dokploy2",
-          "status": "down",
-          "latency": 328
-        },
-        {
           "url": "https://fcctpauth.usmp.edu.pe",
           "name": "FCCTP Auth",
           "status": "up",
@@ -3249,12 +3243,6 @@
           "latency": 610
         },
         {
-          "url": "https://dokploy2.fcctp.edu.pe",
-          "name": "Dokploy2",
-          "status": "down",
-          "latency": 340
-        },
-        {
           "url": "https://fcctpauth.usmp.edu.pe",
           "name": "FCCTP Auth",
           "status": "up",
@@ -3295,6 +3283,59 @@
           "name": "Mesa de Partes",
           "status": "up",
           "latency": 1556
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-07-20T13:19:05.652Z",
+      "services": [
+        {
+          "url": "https://dokploy.fcctp.edu.pe",
+          "name": "Dokploy",
+          "status": "up",
+          "latency": 1265
+        },
+        {
+          "url": "https://fcctpauth.usmp.edu.pe",
+          "name": "FCCTP Auth",
+          "status": "up",
+          "latency": 1601
+        },
+        {
+          "url": "https://app.fcctp.edu.pe/",
+          "name": "App FCCTP",
+          "status": "up",
+          "latency": 5602
+        },
+        {
+          "url": "https://n8n.fcctp.edu.pe/",
+          "name": "n8n FCCTP",
+          "status": "up",
+          "latency": 1239
+        },
+        {
+          "url": "https://odoo.fcctp.edu.pe/",
+          "name": "Odoo FCCTP",
+          "status": "up",
+          "latency": 1225
+        },
+        {
+          "url": "https://chatwoot.fcctp.edu.pe/",
+          "name": "Chatwoot FCCTP",
+          "status": "up",
+          "latency": 1451
+        },
+        {
+          "url": "https://apps.fcctp.edu.pe/bienestar-universitario",
+          "name": "Bienestar Universitario",
+          "status": "up",
+          "latency": 4092
+        },
+        {
+          "url": "https://mesadepartes.fcctp.edu.pe/",
+          "name": "Mesa de Partes",
+          "status": "up",
+          "latency": 3324
         }
       ]
     }
