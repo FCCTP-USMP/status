@@ -15,7 +15,7 @@ function useFetch(url) {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch(url);
+        const res = await fetch(`${url}?t=${Date.now()}`);
         const json = await res.json();
         if (!cancelled) setData(json);
       } catch {

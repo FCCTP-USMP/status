@@ -43,7 +43,7 @@ export default function IncidentsList({ incidents }) {
           <div key={inc.id} className="bg-white dark:bg-gray-900 border border-red-200 dark:border-red-900/50 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-red-500 status-pulse" />
-              <span className="text-sm font-medium text-red-600 dark:text-red-400">Activo</span>
+              <span className="text-sm font-medium text-red-600 dark:text-red-400">Servicio Caído</span>
             </div>
             <p className="font-medium text-gray-900 dark:text-white">{inc.service}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">

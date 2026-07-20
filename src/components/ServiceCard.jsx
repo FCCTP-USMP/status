@@ -11,7 +11,10 @@ export default function ServiceCard({ service, latencyData }) {
     : '—';
 
   const serviceLatency = latencyData?.checks
-    ?.map(c => c.services.find(s => s.url === service.url))
+    ?.map(c => {
+      const found = c.services.find(s => s.url === service.url);
+      return found ? { ...found, timestamp: c.timestamp } : null;
+    })
     .filter(Boolean) || [];
 
   return (
@@ -64,7 +67,7 @@ export default function ServiceCard({ service, latencyData }) {
                 </div>
               )}
             </div>
-            <LatencyChart data={serviceLatency} />
+            <LatencyChart data={serviceLatency} dailyUptime={service.dailyUptime} />
           </div>
         </div>
       )}
