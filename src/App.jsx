@@ -54,6 +54,19 @@ export default function App() {
   const someDown = totalServices > 0 && upServices < totalServices && upServices > 0;
   const allDown = totalServices > 0 && upServices === 0;
 
+  const lastCheck = services[0]?.last_check;
+  const lastUpdatedStr = lastCheck
+    ? new Date(lastCheck).toLocaleString('es-PE', {
+        timeZone: 'America/Lima',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+    : '';
+
   let bannerStatus = 'operational';
   if (allDown) bannerStatus = 'down';
   else if (someDown) bannerStatus = 'degraded';
@@ -68,7 +81,10 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FCCTP Status</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Estado de los servicios institucionales</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Estado de los servicios institucionales
+                {lastUpdatedStr && ` • Última actualización: ${lastUpdatedStr}`}
+              </p>
             </div>
           </div>
           <button
@@ -110,7 +126,7 @@ export default function App() {
         )}
 
         <footer className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-400 dark:text-gray-600">
-          <p>FCCTP Status &mdash; Monitoreo automatizado &middot; Actualizado cada 10 minutos</p>
+          <p>FCCTP Status &mdash; Monitoreo automatizado</p>
         </footer>
       </div>
     </div>
