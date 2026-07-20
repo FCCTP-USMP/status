@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar, ReferenceLine } from 'recharts';
 
 export default function LatencyChart({ data, dailyUptime }) {
   const [range, setRange] = useState('24h');
@@ -152,6 +152,13 @@ export default function LatencyChart({ data, dailyUptime }) {
                 axisLine={false}
                 unit="ms"
                 reversed={true}
+                domain={[0, 10000]}
+              />
+              <ReferenceLine
+                y={10000}
+                stroke="#ef4444"
+                strokeDasharray="3 3"
+                label={{ value: 'Límite (10s)', fill: '#ef4444', position: 'top', fontSize: 10 }}
               />
               <Tooltip
                 contentStyle={{

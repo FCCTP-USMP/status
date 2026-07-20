@@ -74,26 +74,46 @@ function getLimaDateKey(date) {
   return `${d.year}-${String(d.month).padStart(2, "0")}-${String(d.day).padStart(2, "0")}`;
 }
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function checkService(service) {
-  const start = Date.now();
-  try {
-    const response = await axios.get(service.url, {
-      timeout: 10000,
-      validateStatus: () => true,
-      maxRedirects: 5,
-    });
-    const latency = Date.now() - start;
-    const isUp = response.status >= 200 && response.status < 500;
-    return { isUp, latency, statusCode: response.status, error: null };
-  } catch (err) {
-    const latency = Date.now() - start;
-    return {
-      isUp: false,
-      latency,
-      statusCode: null,
-      error: err.code || err.message,
-    };
+  const maxAttempts = 3;
+  let lastResult = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const start = Date.now();
+    try {
+      const response = await axios.get(service.url, {
+        timeout: 10000,
+        validateStatus: () => true,
+        maxRedirects: 0,
+      });
+      const latency = Date.now() - start;
+      const isUp = response.status >= 200 && response.status < 400;
+      lastResult = { isUp, latency, statusCode: response.status, error: null };
+
+      if (isUp) {
+        return lastResult;
+      }
+      log(`[Intento ${attempt}/${maxAttempts}] ${service.name} respondió con código HTTP ${response.status}`);
+    } catch (err) {
+      const latency = Date.now() - start;
+      lastResult = {
+        isUp: false,
+        latency,
+        statusCode: null,
+        error: err.code || err.message,
+      };
+      log(`[Intento ${attempt}/${maxAttempts}] Fallo de red/timeout en ${service.name}: ${err.code || err.message}`);
+    }
+
+    if (attempt < maxAttempts) {
+      log(`Esperando 5 segundos para reintentar ${service.name}...`);
+      await delay(5000);
+    }
   }
+
+  return lastResult;
 }
 
 function createTransporter() {
