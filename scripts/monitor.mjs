@@ -14,7 +14,6 @@ const LIMA_TZ = "America/Lima";
 
 const SERVICES = [
   { url: "https://dokploy.fcctp.edu.pe", name: "Dokploy" },
-  { url: "https://dokploy2.fcctp.edu.pe", name: "Dokploy2" },
   { url: "https://fcctpauth.usmp.edu.pe", name: "FCCTP Auth" },
   { url: "https://app.fcctp.edu.pe/", name: "App FCCTP" },
   { url: "https://n8n.fcctp.edu.pe/", name: "n8n FCCTP" },
