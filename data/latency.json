@@ -2066,6 +2066,59 @@
           "latency": 660
         }
       ]
+    },
+    {
+      "timestamp": "2026-07-20T07:00:25.211Z",
+      "services": [
+        {
+          "url": "https://dokploy.fcctp.edu.pe",
+          "name": "Dokploy",
+          "status": "up",
+          "latency": 537
+        },
+        {
+          "url": "https://fcctpauth.usmp.edu.pe",
+          "name": "FCCTP Auth",
+          "status": "up",
+          "latency": 798
+        },
+        {
+          "url": "https://app.fcctp.edu.pe/",
+          "name": "App FCCTP",
+          "status": "up",
+          "latency": 2305
+        },
+        {
+          "url": "https://n8n.fcctp.edu.pe/",
+          "name": "n8n FCCTP",
+          "status": "up",
+          "latency": 486
+        },
+        {
+          "url": "https://odoo.fcctp.edu.pe/",
+          "name": "Odoo FCCTP",
+          "status": "up",
+          "latency": 277
+        },
+        {
+          "url": "https://chatwoot.fcctp.edu.pe/",
+          "name": "Chatwoot FCCTP",
+          "status": "up",
+          "latency": 654
+        },
+        {
+          "url": "https://apps.fcctp.edu.pe/bienestar-universitario",
+          "name": "Bienestar Universitario",
+          "status": "up",
+          "latency": 1136
+        },
+        {
+          "url": "https://mesadepartes.fcctp.edu.pe/",
+          "name": "Mesa de Partes",
+          "status": "up",
+          "latency": 1250
+        }
+      ]
     }
   ]
 }
