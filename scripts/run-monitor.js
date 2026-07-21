@@ -1,10 +1,10 @@
 import { SERVICES } from '../src/services.js';
 
 const targetUrl = process.env.WORKER_URL || 'https://fcctp-status.fcctp.workers.dev';
-const token = process.env.TEST_TOKEN;
+const token = process.env.MONITOR_SECRET;
 
 if (!token) {
-  console.error('Error: TEST_TOKEN es requerido para autenticarse con el Worker.');
+  console.error('Error: MONITOR_SECRET es requerido para autenticarse con el Worker.');
   process.exit(1);
 }
 

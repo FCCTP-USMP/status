@@ -11,10 +11,10 @@ let token = '';
 
 if (isRemote) {
   baseUrl = 'https://fcctp-status.fcctp.workers.dev';
-  token = process.env.TEST_TOKEN;
+  token = process.env.MONITOR_SECRET;
   if (!token) {
-    console.error('Error: Debes definir la variable de entorno TEST_TOKEN para pruebas remotas.');
-    console.error('Ejemplo: TEST_TOKEN="tu-token-remoto" npm run test:email:remote -- --to=correo@gmail.com');
+    console.error('Error: Debes definir la variable de entorno MONITOR_SECRET para pruebas remotas.');
+    console.error('Ejemplo: MONITOR_SECRET="tu-token-remoto" npm run test:email:remote -- --to=correo@gmail.com');
     process.exit(1);
   }
 } else {
@@ -22,7 +22,7 @@ if (isRemote) {
     const devVarsPath = path.resolve('.dev.vars');
     if (fs.existsSync(devVarsPath)) {
       const content = fs.readFileSync(devVarsPath, 'utf8');
-      const match = content.match(/TEST_TOKEN="?([^"\n\r]+)"?/);
+      const match = content.match(/MONITOR_SECRET="?([^"\n\r]+)"?/);
       if (match) token = match[1];
     }
   } catch (err) {
@@ -30,7 +30,7 @@ if (isRemote) {
   }
 
   if (!token) {
-    console.error('Error: No se encontró TEST_TOKEN en el archivo .dev.vars.');
+    console.error('Error: No se encontró MONITOR_SECRET en el archivo .dev.vars.');
     process.exit(1);
   }
 }

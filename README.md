@@ -65,7 +65,7 @@ SMTP_SECURE="false"
 SMTP_USER=""
 SMTP_PASS=""
 NOTIFICATION_EMAIL="alertas-local@fcctp.local"
-TEST_TOKEN="token-local-test-seguro"
+MONITOR_SECRET="token-local-test-seguro"
 ```
 
 ### Producción (secretos de Cloudflare)
@@ -73,7 +73,7 @@ TEST_TOKEN="token-local-test-seguro"
 npx wrangler secret put SMTP_USER
 npx wrangler secret put SMTP_PASS
 npx wrangler secret put NOTIFICATION_EMAIL
-npx wrangler secret put TEST_TOKEN
+npx wrangler secret put MONITOR_SECRET
 ```
 
 ## Arquitectura

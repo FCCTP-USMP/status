@@ -23,5 +23,5 @@ jobs:
       - name: Run Monitor
         env:
           WORKER_URL: 'https://fcctp-status.fcctp.workers.dev'
-          TEST_TOKEN: ${{ secrets.MONITOR_TEST_TOKEN }}
+          MONITOR_SECRET: ${{ secrets.MONITOR_SECRET }}
         run: node scripts/run-monitor.js

@@ -407,7 +407,7 @@ async function handleRequest(request, env, ctx) {
 
   if (url.pathname === '/api/trigger-test-email' && request.method === 'POST') {
     const authHeader = request.headers.get('X-Test-Token');
-    if (!authHeader || authHeader !== env.TEST_TOKEN) {
+    if (!authHeader || authHeader !== env.MONITOR_SECRET) {
       return new Response('No autorizado', { status: 401 });
     }
 
@@ -460,7 +460,7 @@ async function handleRequest(request, env, ctx) {
 
   if (url.pathname === '/api/update-status' && request.method === 'POST') {
     const authHeader = request.headers.get('X-Auth-Token');
-    if (!authHeader || authHeader !== env.TEST_TOKEN) {
+    if (!authHeader || authHeader !== env.MONITOR_SECRET) {
       return new Response('No autorizado', { status: 401 });
     }
 
