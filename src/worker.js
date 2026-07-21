@@ -176,96 +176,126 @@ async function handleScheduled(event, env, ctx) {
   const dailyKey = getLimaDateKey();
   const changes = [];
 
-  const { results: existingRows } = await db.prepare('SELECT * FROM services').all();
+  // 1. Obtener estados previos en un solo batch de lectura
+  const [servicesRes, incidentsRes] = await db.batch([
+    db.prepare('SELECT * FROM services'),
+    db.prepare('SELECT * FROM incidents WHERE resolved_at IS NULL')
+  ]);
+
   const statusMap = {};
-  for (const row of existingRows) {
+  for (const row of servicesRes.results || []) {
     statusMap[row.url] = row;
   }
 
-  for (const service of SERVICES) {
-    const prev = statusMap[service.url] || { status: 'up', last_state_change: null, last_notification_sent: null };
+  const openIncidentMap = {};
+  for (const row of incidentsRes.results || []) {
+    openIncidentMap[row.url] = row;
+  }
 
-    const result = await checkService(service);
+  // 2. Ejecutar los checks en paralelo
+  const checkResults = await Promise.all(
+    SERVICES.map(async (service) => {
+      const result = await checkService(service);
+      return { service, result };
+    })
+  );
+
+  // 3. Preparar lote de escrituras
+  const statements = [];
+
+  for (const { service, result } of checkResults) {
+    const prev = statusMap[service.url] || { status: 'up', last_state_change: null, last_notification_sent: null };
     const currentStatus = result.isUp ? 'up' : 'down';
 
-    const uptimeRow = await db.prepare(
-      'SELECT * FROM daily_uptime WHERE url = ? AND date = ?'
-    ).bind(service.url, dailyKey).first();
+    // UPSERT de Uptime diario
+    statements.push(
+      db.prepare(`
+        INSERT INTO daily_uptime (url, date, checks, failures) VALUES (?, ?, 1, ?)
+        ON CONFLICT(url, date) DO UPDATE SET
+          checks = daily_uptime.checks + 1,
+          failures = daily_uptime.failures + excluded.failures
+      `).bind(service.url, dailyKey, result.isUp ? 0 : 1)
+    );
 
-    if (uptimeRow) {
-      await db.prepare(
-        'UPDATE daily_uptime SET checks = checks + 1, failures = failures + ? WHERE url = ? AND date = ?'
-      ).bind(result.isUp ? 0 : 1, service.url, dailyKey).run();
-    } else {
-      await db.prepare(
-        'INSERT INTO daily_uptime (url, date, checks, failures) VALUES (?, ?, 1, ?)'
-      ).bind(service.url, dailyKey, result.isUp ? 0 : 1).run();
-    }
-
+    // Lógica de incidentes sin consultas adicionales
     if (currentStatus !== prev.status) {
       console.log(`${service.name}: ${prev.status} -> ${currentStatus}`);
 
       if (currentStatus === 'down') {
         const incidentId = generateId();
-        await db.prepare(
-          'INSERT INTO incidents (id, service, url, type, started_at, error) VALUES (?, ?, ?, ?, ?, ?)'
-        ).bind(incidentId, service.name, service.url, 'down', now, result.error).run();
+        statements.push(
+          db.prepare(
+            'INSERT INTO incidents (id, service, url, type, started_at, error) VALUES (?, ?, ?, ?, ?, ?)'
+          ).bind(incidentId, service.name, service.url, 'down', now, result.error)
+        );
         changes.push({ service: { name: service.name, url: service.url }, status: 'down', error: result.error, duration: null });
       } else {
-        const openIncident = await db.prepare(
-          'SELECT * FROM incidents WHERE url = ? AND resolved_at IS NULL'
-        ).bind(service.url).first();
-
+        const openIncident = openIncidentMap[service.url];
         let durationMin = null;
         if (openIncident) {
           const startTime = new Date(openIncident.started_at).getTime();
           durationMin = Math.round((Date.now() - startTime) / 60000);
-          await db.prepare(
-            'UPDATE incidents SET resolved_at = ?, duration_minutes = ? WHERE id = ?'
-          ).bind(now, durationMin, openIncident.id).run();
+          statements.push(
+            db.prepare('UPDATE incidents SET resolved_at = ?, duration_minutes = ? WHERE id = ?')
+              .bind(now, durationMin, openIncident.id)
+          );
         }
         changes.push({ service: { name: service.name, url: service.url }, status: 'up', error: null, duration: durationMin });
       }
     }
 
-    await db.prepare(`
-      INSERT INTO services (url, name, description, status, last_state_change, last_notification_sent, latency, status_code, error_message, last_check)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(url) DO UPDATE SET
-        name = excluded.name,
-        status = excluded.status,
-        description = excluded.description,
-        last_state_change = COALESCE(excluded.last_state_change, services.last_state_change),
-        last_notification_sent = CASE WHEN excluded.last_notification_sent IS NOT NULL THEN excluded.last_notification_sent ELSE services.last_notification_sent END,
-        latency = excluded.latency,
-        status_code = excluded.status_code,
-        error_message = excluded.error_message,
-        last_check = excluded.last_check
-    `).bind(
-      service.url, service.name, service.description || '', currentStatus,
-      currentStatus !== prev.status ? now : prev.last_state_change,
-      currentStatus !== prev.status ? now : prev.last_notification_sent,
-      result.latency, result.statusCode, result.error, now
-    ).run();
+    // UPSERT del servicio
+    statements.push(
+      db.prepare(`
+        INSERT INTO services (url, name, description, status, last_state_change, last_notification_sent, latency, status_code, error_message, last_check)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET
+          name = excluded.name,
+          status = excluded.status,
+          description = excluded.description,
+          last_state_change = COALESCE(excluded.last_state_change, services.last_state_change),
+          last_notification_sent = CASE WHEN excluded.last_notification_sent IS NOT NULL THEN excluded.last_notification_sent ELSE services.last_notification_sent END,
+          latency = excluded.latency,
+          status_code = excluded.status_code,
+          error_message = excluded.error_message,
+          last_check = excluded.last_check
+      `).bind(
+        service.url, service.name, service.description || '', currentStatus,
+        currentStatus !== prev.status ? now : prev.last_state_change,
+        currentStatus !== prev.status ? now : prev.last_notification_sent,
+        result.latency, result.statusCode, result.error, now
+      )
+    );
 
-    await db.prepare(
-      'INSERT INTO latency_checks (url, timestamp, latency, status) VALUES (?, ?, ?, ?)'
-    ).bind(service.url, now, result.latency, currentStatus).run();
+    // Registro de latencia
+    statements.push(
+      db.prepare('INSERT INTO latency_checks (url, timestamp, latency, status) VALUES (?, ?, ?, ?)')
+        .bind(service.url, now, result.latency, currentStatus)
+    );
   }
 
-  // Clean up old latency data (keep 7 days)
+  // Limpiezas en lote
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  await db.prepare('DELETE FROM latency_checks WHERE timestamp < ?').bind(sevenDaysAgo).run();
-
-  // Clean up old incidents (keep max 100)
-  await db.prepare(`
+  statements.push(db.prepare('DELETE FROM latency_checks WHERE timestamp < ?').bind(sevenDaysAgo));
+  statements.push(db.prepare(`
     DELETE FROM incidents WHERE id NOT IN (
       SELECT id FROM incidents ORDER BY started_at DESC LIMIT 100
     )
-  `).run();
+  `));
 
-  const { results: allServices } = await db.prepare('SELECT * FROM services').all();
-  const downServices = allServices.filter(s => s.status === 'down');
+  // 4. Ejecutar todas las escrituras en un único viaje a D1
+  await db.batch(statements);
+
+  // 5. Reconstruir los estados en memoria para el envío de alertas
+  const finalServices = SERVICES.map(s => {
+    const check = checkResults.find(r => r.service.url === s.url);
+    return {
+      ...s,
+      status: check.result.isUp ? 'up' : 'down',
+      error_message: check.result.error
+    };
+  });
+  const downServices = finalServices.filter(s => s.status === 'down');
 
   if (changes.length > 0) {
     const hasDown = downServices.length > 0;
@@ -283,7 +313,7 @@ async function handleScheduled(event, env, ctx) {
   console.log('Monitoring check completed.');
 }
 
-async function handleRequest(request, env) {
+async function handleRequest(request, env, ctx) {
   const url = new URL(request.url);
   const db = env.fcctp_status_db;
 
@@ -298,6 +328,15 @@ async function handleRequest(request, env) {
   }
 
   if (url.pathname === '/api/status') {
+    const cacheUrl = new URL(request.url);
+    const cacheKey = new Request(cacheUrl.toString(), request);
+    const cache = caches.default;
+
+    let response = await cache.match(cacheKey);
+    if (response) {
+      return response;
+    }
+
     const { results: services } = await db.prepare('SELECT * FROM services').all();
     const { results: incidents } = await db.prepare(
       'SELECT * FROM incidents ORDER BY started_at DESC LIMIT 100'
@@ -350,17 +389,20 @@ async function handleRequest(request, env) {
         .map(([timestamp, services]) => ({ timestamp, services })),
     };
 
-    return new Response(JSON.stringify({
+    response = new Response(JSON.stringify({
       status: statusJson,
       incidents: { incidents },
       latency: latencyJson,
     }), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Cache-Control': 'public, max-age=900',
         ...corsHeaders,
       },
     });
+
+    ctx.waitUntil(cache.put(cacheKey, response.clone()));
+    return response;
   }
 
   if (url.pathname === '/api/trigger-test-email' && request.method === 'POST') {
@@ -416,6 +458,155 @@ async function handleRequest(request, env) {
     }
   }
 
+  if (url.pathname === '/api/update-status' && request.method === 'POST') {
+    const authHeader = request.headers.get('X-Auth-Token');
+    if (!authHeader || authHeader !== env.TEST_TOKEN) {
+      return new Response('No autorizado', { status: 401 });
+    }
+
+    let payload;
+    try {
+      payload = await request.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'JSON inválido' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    const { results: checkResults, timestamp } = payload;
+    if (!Array.isArray(checkResults)) {
+      return new Response(JSON.stringify({ error: 'Estructura de datos inválida' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    const lima = getLimaDate(new Date(timestamp));
+    const now = lima.iso;
+    const currentHour = lima.hour;
+    const dailyKey = getLimaDateKey(new Date(timestamp));
+    const changes = [];
+
+    const [servicesRes, incidentsRes] = await db.batch([
+      db.prepare('SELECT * FROM services'),
+      db.prepare('SELECT * FROM incidents WHERE resolved_at IS NULL')
+    ]);
+
+    const statusMap = {};
+    for (const row of servicesRes.results || []) {
+      statusMap[row.url] = row;
+    }
+
+    const openIncidentMap = {};
+    for (const row of incidentsRes.results || []) {
+      openIncidentMap[row.url] = row;
+    }
+
+    const statements = [];
+
+    for (const res of checkResults) {
+      const prev = statusMap[res.url] || { status: 'up', last_state_change: null, last_notification_sent: null };
+      const currentStatus = res.isUp ? 'up' : 'down';
+
+      statements.push(
+        db.prepare(`
+          INSERT INTO daily_uptime (url, date, checks, failures) VALUES (?, ?, 1, ?)
+          ON CONFLICT(url, date) DO UPDATE SET
+            checks = daily_uptime.checks + 1,
+            failures = daily_uptime.failures + excluded.failures
+        `).bind(res.url, dailyKey, res.isUp ? 0 : 1)
+      );
+
+      if (currentStatus !== prev.status) {
+        console.log(`${res.name}: ${prev.status} -> ${currentStatus}`);
+
+        if (currentStatus === 'down') {
+          const incidentId = generateId();
+          statements.push(
+            db.prepare(
+              'INSERT INTO incidents (id, service, url, type, started_at, error) VALUES (?, ?, ?, ?, ?, ?)'
+            ).bind(incidentId, res.name, res.url, 'down', now, res.error)
+          );
+          changes.push({ service: { name: res.name, url: res.url }, status: 'down', error: res.error, duration: null });
+        } else {
+          const openIncident = openIncidentMap[res.url];
+          let durationMin = null;
+          if (openIncident) {
+            const startTime = new Date(openIncident.started_at).getTime();
+            durationMin = Math.round((Date.now() - startTime) / 60000);
+            statements.push(
+              db.prepare('UPDATE incidents SET resolved_at = ?, duration_minutes = ? WHERE id = ?')
+                .bind(now, durationMin, openIncident.id)
+            );
+          }
+          changes.push({ service: { name: res.name, url: res.url }, status: 'up', error: null, duration: durationMin });
+        }
+      }
+
+      statements.push(
+        db.prepare(`
+          INSERT INTO services (url, name, description, status, last_state_change, last_notification_sent, latency, status_code, error_message, last_check)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(url) DO UPDATE SET
+            name = excluded.name,
+            status = excluded.status,
+            description = excluded.description,
+            last_state_change = COALESCE(excluded.last_state_change, services.last_state_change),
+            last_notification_sent = CASE WHEN excluded.last_notification_sent IS NOT NULL THEN excluded.last_notification_sent ELSE services.last_notification_sent END,
+            latency = excluded.latency,
+            status_code = excluded.status_code,
+            error_message = excluded.error_message,
+            last_check = excluded.last_check
+        `).bind(
+          res.url, res.name, '', currentStatus,
+          currentStatus !== prev.status ? now : prev.last_state_change,
+          currentStatus !== prev.status ? now : prev.last_notification_sent,
+          res.latency, res.statusCode, res.error, now
+        )
+      );
+
+      statements.push(
+        db.prepare('INSERT INTO latency_checks (url, timestamp, latency, status) VALUES (?, ?, ?, ?)')
+          .bind(res.url, now, res.latency, currentStatus)
+      );
+    }
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    statements.push(db.prepare('DELETE FROM latency_checks WHERE timestamp < ?').bind(sevenDaysAgo));
+    statements.push(db.prepare(`
+      DELETE FROM incidents WHERE id NOT IN (
+        SELECT id FROM incidents ORDER BY started_at DESC LIMIT 100
+      )
+    `));
+
+    await db.batch(statements);
+
+    const downServices = checkResults.filter(r => !r.isUp).map(r => ({
+      name: r.name, url: r.url, error_message: r.error
+    }));
+
+    if (changes.length > 0) {
+      const hasDown = downServices.length > 0;
+      const subject = hasDown ? '[Alerta] Servicios Caídos (Resumen)' : '[Recuperado] Todos los servicios operativos';
+      const html = buildSummaryEmail(changes, downServices, false);
+      ctx.waitUntil(sendEmailAlert(env, subject, html));
+    }
+
+    if (currentHour === 7 && downServices.length > 0) {
+      const subject = `[Recordatorio] ${downServices.length} servicio(s) aún caído(s)`;
+      const html = buildSummaryEmail([], downServices, true);
+      ctx.waitUntil(sendEmailAlert(env, subject, html));
+    }
+
+    const cacheUrl = new URL(request.url);
+    cacheUrl.pathname = '/api/status';
+    const cacheKey = new Request(cacheUrl.toString(), { method: 'GET' });
+    ctx.waitUntil(caches.default.delete(cacheKey));
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
+
   return new Response(JSON.stringify({ ok: true }), {
     headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
@@ -426,6 +617,6 @@ export default {
     ctx.waitUntil(handleScheduled(event, env, ctx));
   },
   fetch(request, env, ctx) {
-    return handleRequest(request, env);
+    return handleRequest(request, env, ctx);
   },
 };
