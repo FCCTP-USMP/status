@@ -214,7 +214,7 @@ export default function App() {
                             <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{inc.service}</p>
                             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Resuelto - Duracion: {inc.duration_minutes} min</p>
                           </div>
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Resolvido</span>
+                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Resuelto</span>
                         </div>
                       ))}
                     </div>

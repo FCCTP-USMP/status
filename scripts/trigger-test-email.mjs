@@ -13,8 +13,27 @@ if (isRemote) {
   baseUrl = 'https://fcctp-status.fcctp.workers.dev';
   token = process.env.MONITOR_SECRET;
   if (!token) {
-    console.error('Error: Debes definir la variable de entorno MONITOR_SECRET para pruebas remotas.');
-    console.error('Ejemplo: MONITOR_SECRET="tu-token-remoto" npm run test:email:remote -- --to=correo@gmail.com');
+    try {
+      const envPath = path.resolve('.env');
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf8');
+        const match = content.match(/MONITOR_SECRET="?([^"\n\r]+)"?/);
+        if (match) token = match[1];
+      }
+    } catch (e) {}
+  }
+  if (!token) {
+    try {
+      const devVarsPath = path.resolve('.dev.vars');
+      if (fs.existsSync(devVarsPath)) {
+        const content = fs.readFileSync(devVarsPath, 'utf8');
+        const match = content.match(/MONITOR_SECRET="?([^"\n\r]+)"?/);
+        if (match) token = match[1];
+      }
+    } catch (e) {}
+  }
+  if (!token) {
+    console.error('Error: Debes definir la variable de entorno MONITOR_SECRET en .env, .dev.vars o entorno para pruebas remotas.');
     process.exit(1);
   }
 } else {
@@ -35,10 +54,10 @@ if (isRemote) {
   }
 }
 
-console.log(`Enviando petición de prueba a ${baseUrl}/api/trigger-test-email...`);
+console.log(`Enviando petición a ${baseUrl}/api/send-summary...`);
 
 try {
-  const response = await fetch(`${baseUrl}/api/trigger-test-email`, {
+  const response = await fetch(`${baseUrl}/api/send-summary`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

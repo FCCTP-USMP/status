@@ -22,6 +22,12 @@ async function sendCommand(writer, encoder, cmd) {
 }
 
 export async function sendEmail({ host, port, secure, user, pass, from, to, subject, html }) {
+  let cleanFrom = from || user;
+  const emailMatch = cleanFrom.match(/<([^>]+)>/);
+  if (emailMatch) {
+    cleanFrom = emailMatch[1];
+  }
+
   const socket = connect(
     { hostname: host, port: parseInt(port, 10) },
     { secureTransport: secure === 'true' ? 'on' : 'off' }
@@ -69,16 +75,19 @@ export async function sendEmail({ host, port, secure, user, pass, from, to, subj
     }
 
     console.log('SMTP: MAIL FROM...');
-    await cmd(`MAIL FROM:<${from || user}>`);
+    await cmd(`MAIL FROM:<${cleanFrom}>`);
     res = await line();
     console.log('SMTP MAIL FROM response:', res);
     if (!res || !res.startsWith('250')) throw new Error(`MAIL FROM: ${res}`);
 
     console.log('SMTP: RCPT TO...');
-    await cmd(`RCPT TO:<${to}>`);
-    res = await line();
-    console.log('SMTP RCPT TO response:', res);
-    if (!res || (!res.startsWith('250') && !res.startsWith('251'))) throw new Error(`RCPT TO: ${res}`);
+    const recipients = to.split(',').map(email => email.trim());
+    for (const recipient of recipients) {
+      await cmd(`RCPT TO:<${recipient}>`);
+      res = await line();
+      console.log(`SMTP RCPT TO (${recipient}) response:`, res);
+      if (!res || (!res.startsWith('250') && !res.startsWith('251'))) throw new Error(`RCPT TO <${recipient}>: ${res}`);
+    }
 
     console.log('SMTP: DATA...');
     await cmd('DATA');

@@ -76,7 +76,7 @@ async function sendEmailAlert(env, subject, html) {
       secure: env.SMTP_SECURE,
       user: env.SMTP_USER,
       pass: env.SMTP_PASS,
-      from: env.SMTP_USER,
+      from: env.SMTP_FROM || env.SMTP_USER,
       to: env.NOTIFICATION_EMAIL,
       subject,
       html,
@@ -405,6 +405,60 @@ async function handleRequest(request, env, ctx) {
     return response;
   }
 
+  if (url.pathname === '/api/send-summary' && request.method === 'POST') {
+    const authHeader = request.headers.get('X-Test-Token');
+    if (!authHeader || authHeader !== env.MONITOR_SECRET) {
+      return new Response('No autorizado', { status: 401 });
+    }
+
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (e) {}
+
+    const targetEmail = body.to || env.NOTIFICATION_EMAIL;
+    if (!targetEmail) {
+      return new Response(JSON.stringify({ error: 'Falta email de destino' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    try {
+      const { results: services } = await db.prepare('SELECT * FROM services').all();
+      const downServices = services.filter(s => s.status === 'down');
+      
+      const hasDown = downServices.length > 0;
+      const subject = hasDown 
+        ? `[Resumen Real] Alerta: ${downServices.length} servicio(s) caído(s)` 
+        : '[Resumen Real] Todos los servicios operativos';
+
+      const html = buildSummaryEmail([], downServices, false);
+
+      await sendEmail({
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        secure: env.SMTP_SECURE,
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+        from: env.SMTP_FROM || env.SMTP_USER,
+        to: targetEmail,
+        subject,
+        html,
+      });
+
+      return new Response(JSON.stringify({ success: true, sent_to: targetEmail, down_count: downServices.length }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    } catch (err) {
+      console.error('Error en send-summary:', err);
+      return new Response(JSON.stringify({ success: false, error: err.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+  }
+
   if (url.pathname === '/api/trigger-test-email' && request.method === 'POST') {
     const authHeader = request.headers.get('X-Test-Token');
     if (!authHeader || authHeader !== env.MONITOR_SECRET) {
@@ -441,7 +495,7 @@ async function handleRequest(request, env, ctx) {
         secure: env.SMTP_SECURE,
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
-        from: env.SMTP_USER,
+        from: env.SMTP_FROM || env.SMTP_USER,
         to: targetEmail,
         subject,
         html,
