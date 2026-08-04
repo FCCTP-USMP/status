@@ -143,7 +143,7 @@ export default function App() {
         <div className="text-center mb-10">
           <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">FCCTP System Status</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex justify-center items-center gap-1.5">
-            <span>Frecuencia: cada 5 min (timeout de 10s con 3 intentos a intervalos de 5s)</span>
+            <span>Frecuencia: cada 10 min de 06:00 a 23:59 (job habilitado */10 6-23 * * * en cron-job.org) (timeout de 10s con 3 intentos a intervalos de 5s)</span>
           </p>
           {lastUpdatedStr && (
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
