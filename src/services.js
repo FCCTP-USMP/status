@@ -65,4 +65,22 @@ export const SERVICES = [
     description:
       "Solicitud de cartas de presentación para prácticas pre-profesionales.",
   },
+  {
+    url: "https://revistacorrespondenciasyanalisis.edu.pe/",
+    name: "Revista Correspondencias y Análisis",
+    description:
+      "Correspondencias & Análisis es una revista de comunicación social que publica artículos especializados en comunicación y áreas afines, los cuales son originales e inéditos.",
+  },
+  {
+    url: "https://revistaliberabit.edu.pe/",
+    name: "Revista Liberabit",
+    description:
+      "Liberabit, es una publicación de la Escuela Profesional de Psicología de la Universidad de San Martín de Porres (Lima, Perú). Inicia sus actividades en 1995 con una periodicidad anual, desde el año 2008 se publica semestralmente (enero-junio; julio-diciembre) y actualmente se publica de manera continua.",
+  },
+  {
+    url: "https://revistaturismoypatrimonio.edu.pe/",
+    name: "Revista Turismo y Patrimonio",
+    description:
+      "Turismo y Patrimonio es la revista del Instituto de Investigación de la Facultad de Ciencias de la Comunicación, Turismo y Psicología de la Universidad de San Martín de Porres. Es una publicación semestral de ciencias sociales aplicadas y de enfoque multidisciplinario. Su propósito es exponer a la comunidad científica y académica las diversas perspectivas, posturas y resultados sobre temas vinculados al turismo y el patrimonio, a través de artículos de investigación en español e inglés.",
+  },
 ];
