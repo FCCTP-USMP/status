@@ -9,10 +9,28 @@ if (!token && !isDryRun) {
   process.exit(1);
 }
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Ejecuta tareas con límite de concurrencia para no saturar servidores compartidos
+async function mapConcurrent(items, limit, fn) {
+  const results = new Array(items.length);
+  let currentIndex = 0;
+
+  async function worker() {
+    while (currentIndex < items.length) {
+      const index = currentIndex++;
+      results[index] = await fn(items[index]);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
 
 async function checkService(service) {
   const maxAttempts = 3;
+  const timeoutMs = 10000; // 10 segundos de timeout por intento
   let lastResult = null;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -27,49 +45,98 @@ async function checkService(service) {
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
           'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
         },
+        signal: AbortSignal.timeout(timeoutMs),
       });
+
       const latency = Date.now() - start;
       const statusCode = response.status;
       const isUp = (statusCode >= 200 && statusCode < 400) || statusCode === 401;
-      lastResult = { url: service.url, name: service.name, isUp, latency, statusCode, error: null };
+      const statusText = response.statusText ? ` ${response.statusText}` : '';
+      const error = isUp ? null : `HTTP ${statusCode}${statusText}`;
+
+      lastResult = { url: service.url, name: service.name, isUp, latency, statusCode, error };
 
       if (isUp) {
         return lastResult;
       }
-      console.log(`[Intento ${attempt}/${maxAttempts}] ${service.name} respondió con código ${statusCode}`);
+      console.log(`[Intento ${attempt}/${maxAttempts}] ${service.name} respondió con código ${statusCode} (${error})`);
     } catch (err) {
       const latency = Date.now() - start;
+      const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+      const cause = err.cause;
+      const errorMsg = isTimeout
+        ? `ETIMEDOUT (${timeoutMs / 1000}s)`
+        : (cause?.code || cause?.message || err.message || err.code || 'Error de red');
+
       lastResult = {
         url: service.url,
         name: service.name,
         isUp: false,
         latency,
         statusCode: null,
-        error: err.name === 'TimeoutError' ? 'ETIMEDOUT' : err.message || err.code,
+        error: errorMsg,
       };
-      console.log(`[Intento ${attempt}/${maxAttempts}] Fallo de red/timeout en ${service.name}: ${lastResult.error}`);
+      console.log(`[Intento ${attempt}/${maxAttempts}] Fallo de red en ${service.name}: ${lastResult.error}`);
     }
 
     if (attempt < maxAttempts) {
-      console.log(`Esperando 5 segundos para reintentar ${service.name}...`);
-      await delay(5000);
+      console.log(`Esperando 3 segundos para reintentar ${service.name}...`);
+      await delay(3000);
     }
   }
 
   return lastResult;
 }
 
-async function run() {
-  console.log('Iniciando monitoreo de servicios...');
-  const timestamp = new Date().toISOString();
+// Carril exclusivo y secuencial para las 3 revistas (comparten servidor 18.235.189.209)
+// Garantiza que NUNCA se consulten en paralelo entre sí.
+let journalQueue = Promise.resolve();
 
-  const results = await Promise.all(SERVICES.map(checkService));
+async function checkServiceWithLane(service) {
+  const isJournal = service.url.includes('revista');
+
+  if (isJournal) {
+    // Encadenar en su propio carril secuencial
+    const currentPromise = journalQueue.then(async () => {
+      console.log(`[Carril Revistas] Verificando ${service.name}...`);
+      const res = await checkService(service);
+      await delay(500); // Pausa de alivio para el servidor Apache/PHP
+      return res;
+    });
+    journalQueue = currentPromise.catch(() => {});
+    return currentPromise;
+  }
+
+  return checkService(service);
+}
+
+async function run() {
+  const startDate = new Date();
+  const timestamp = startDate.toISOString();
+  const formattedLaunch = startDate.toLocaleString('es-PE', {
+    timeZone: 'America/Lima',
+    hour12: true,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+
+  console.log(`Iniciando monitoreo de servicios... [${formattedLaunch}]`);
+
+  // Limitar concurrencia general a 4 peticiones en paralelo
+  const CONCURRENCY_LIMIT = 4;
+  const results = await mapConcurrent(SERVICES, CONCURRENCY_LIMIT, checkServiceWithLane);
 
   if (isDryRun) {
+    const elapsedSeconds = ((Date.now() - startDate.getTime()) / 1000).toFixed(2);
     console.log('\n================== PREVIEW / DRY RUN ==================');
-    console.log(`Fecha/Hora: ${timestamp}`);
-    console.log(`Total servicios: ${results.length}`);
-    console.log(`Activos (UP): ${results.filter(r => r.isUp).length} | Caídos (DOWN): ${results.filter(r => !r.isUp).length}`);
+    console.log(`🚀 Fecha y hora de lanzamiento: ${formattedLaunch} (Hora Perú)`);
+    console.log(`⏱️  Duración total del chequeo:  ${elapsedSeconds}s`);
+    console.log(`📊 Total servicios:              ${results.length}`);
+    console.log(`🟢 Activos (UP): ${results.filter((r) => r.isUp).length} | 🔴 Caídos (DOWN): ${results.filter((r) => !r.isUp).length}`);
     console.table(
       results.map((r) => ({
         Servicio: r.name,
