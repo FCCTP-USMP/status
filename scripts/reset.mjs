@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { SERVICES } from '../src/services.js';
 
 const dbName = 'fcctp-status-db';
 
@@ -14,7 +15,13 @@ function runReset(isRemote) {
     execSync(`npx wrangler d1 execute ${dbName} ${target} --file=./schema.sql`, { stdio: 'inherit' });
 
     console.log('- Insertando servicios iniciales...');
-    execSync(`npx wrangler d1 execute ${dbName} ${target} --file=./migrate.sql`, { stdio: 'inherit' });
+    const sqlStatements = SERVICES.map(s => {
+      const nameEscaped = s.name.replace(/'/g, "''");
+      const descEscaped = (s.description || '').replace(/'/g, "''");
+      return `INSERT OR REPLACE INTO services (url, name, description, status) VALUES ('${s.url}', '${nameEscaped}', '${descEscaped}', 'up');`;
+    }).join(' ');
+
+    execSync(`npx wrangler d1 execute ${dbName} ${target} --command="${sqlStatements}"`, { stdio: 'inherit' });
 
     console.log(`\nBase de datos ${isRemote ? 'REMOTA' : 'LOCAL'} reseteada con exito.\n`);
   } catch (error) {
