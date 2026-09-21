@@ -1,9 +1,10 @@
 import { SERVICES } from '../src/services.js';
 
+const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--preview');
 const targetUrl = process.env.WORKER_URL || 'https://fcctp-status.fcctp.workers.dev';
 const token = process.env.MONITOR_SECRET;
 
-if (!token) {
+if (!token && !isDryRun) {
   console.error('Error: MONITOR_SECRET es requerido para autenticarse con el Worker.');
   process.exit(1);
 }
@@ -19,7 +20,13 @@ async function checkService(service) {
     try {
       const response = await fetch(service.url, {
         method: 'GET',
-        headers: { 'User-Agent': 'FCCTP Status Bot' },
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept':
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+        },
       });
       const latency = Date.now() - start;
       const statusCode = response.status;
@@ -57,6 +64,24 @@ async function run() {
   const timestamp = new Date().toISOString();
 
   const results = await Promise.all(SERVICES.map(checkService));
+
+  if (isDryRun) {
+    console.log('\n================== PREVIEW / DRY RUN ==================');
+    console.log(`Fecha/Hora: ${timestamp}`);
+    console.log(`Total servicios: ${results.length}`);
+    console.log(`Activos (UP): ${results.filter(r => r.isUp).length} | Caídos (DOWN): ${results.filter(r => !r.isUp).length}`);
+    console.table(
+      results.map((r) => ({
+        Servicio: r.name,
+        Estado: r.isUp ? '✅ UP' : '❌ DOWN',
+        Código: r.statusCode ?? 'N/A',
+        Latencia: `${r.latency}ms`,
+        Error: r.error || '-',
+      }))
+    );
+    console.log('Modo preview: No se enviaron datos al Cloudflare Worker.');
+    return;
+  }
 
   console.log('Enviando resultados al Cloudflare Worker...');
   try {

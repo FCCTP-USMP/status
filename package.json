@@ -11,6 +11,8 @@
     "update:services-worker": "node scripts/update-services.mjs --remote",
     "test:email": "node scripts/trigger-test-email.mjs",
     "test:email:remote": "node scripts/trigger-test-email.mjs --remote",
+    "monitor": "node scripts/run-monitor.js",
+    "monitor:preview": "node scripts/run-monitor.js --preview",
     "reset:worker": "node scripts/reset.mjs --remote",
     "deploy:worker": "npm run build && npx wrangler deploy",
     "dev:worker": "npx wrangler dev src/worker.js",
